@@ -1,0 +1,4 @@
+﻿  server2.cpp
+C:\Programming\Lab\lab02\server2\server2\server2.cpp(82,21): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Programming\Lab\lab02\server2\server2\server2.cpp(648,22): warning C4018: <: несоответствие типов со знаком и без знака
+  server2.vcxproj -> C:\Programming\Lab\lab02\server2\Debug\server2.exe

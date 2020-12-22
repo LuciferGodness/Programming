@@ -1,0 +1,6 @@
+﻿  24++.cpp
+C:\Programming\Practice\24\24++\24++\24++.cpp(17,19): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Programming\Practice\24\24++\24++\24++.cpp(26,27): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Programming\Practice\24\24++\24++\24++.cpp(12,15): warning C4101: a: неиспользованная локальная переменная
+C:\Programming\Practice\24\24++\24++\24++.cpp(12,22): warning C4101: j: неиспользованная локальная переменная
+  24++.vcxproj -> C:\Programming\Practice\24\24++\Debug\24++.exe

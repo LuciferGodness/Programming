@@ -1,0 +1,7 @@
+﻿  08++.cpp
+C:\Programming\Practice\01\08++\08++\08++.cpp(22,18): warning C4244: return: преобразование "float" в "int", возможна потеря данных
+C:\Programming\Practice\01\08++\08++\08++.cpp(24,18): warning C4244: return: преобразование "float" в "int", возможна потеря данных
+C:\Programming\Practice\01\08++\08++\08++.cpp(26,18): warning C4244: return: преобразование "float" в "int", возможна потеря данных
+C:\Programming\Practice\01\08++\08++\08++.cpp(28,18): warning C4244: return: преобразование "float" в "int", возможна потеря данных
+C:\Programming\Practice\01\08++\08++\08++.cpp(30,16): warning C4244: return: преобразование "double" в "int", возможна потеря данных
+  08++.vcxproj -> C:\Programming\Practice\01\08++\Debug\08++.exe

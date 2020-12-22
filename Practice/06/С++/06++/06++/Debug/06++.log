@@ -1,0 +1,4 @@
+﻿  06++.cpp
+C:\Programming\Practice\01\06++\06++\06++.cpp(23,29): warning C4244: =: преобразование "double" в "int", возможна потеря данных
+C:\Programming\Practice\01\06++\06++\06++.cpp(24,29): warning C4244: =: преобразование "double" в "int", возможна потеря данных
+  06++.vcxproj -> C:\Programming\Practice\01\06++\Debug\06++.exe
