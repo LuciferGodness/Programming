@@ -3,16 +3,37 @@
 
 #include <iostream>
 #include<map>
+#include <vector>
 using namespace std;
+
+struct students {
+    string name;
+    int group;
+    int m, p, h, pr;
+    map<string, int> exams = { {"math", m},
+                              {"phys", p},
+                              {"hist", h},
+                              {"prog", pr} };
+};
+
+ostream& operator << (ostream& out, vector<students> student)
+{
+    out 
+}
 int main()
 {
-    struct students {
-        string name;
-        int group;
-        map<string, int> exams = { {'math', 5},
-                                  {'phys', 5},
-                                  {'hist', 5},
-                                  {'prog', 5} };
+    vector<students> Student
+    {
+        students{"Malfoy D", 1, 5, 5, 5, 5},
+        students{"Plov M", 1, 4, 3, 4, 4},
+        students{"Umerov T", 3, 3, 2, 2, 3},
+        students{"Sheih I", 2, 3, 5, 3, 2},
+        students{"Jan P", 3, 3, 3, 4, 3},
+        students{"Krisa L", 3, 3, 3, 4, 2},
+        students{"Phisihka N", 4, 2, 3, 2, 2},
+        students{"Najiha M", 4, 2, 3, 2, 2},
+        students{"Mopedovna N", 4, 2, 3, 3, 2},
+        students{"Dunya J", 2, 5, 5, 5, 4},
     };
 }
 // Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
