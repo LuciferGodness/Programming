@@ -805,7 +805,7 @@ int main()
 <br>
 Клиентское приложение подключается к корню сайта http://127.0.0.1:5000/, куда отправляется post-запрос в формате json. Приложение берёт оттуда данные и записывает в excel-файл.
 <br>
-<a href = ./Lab/lab02/client2/data.xlsx>Файл</a>
+<a href = "./Lab/lab02/client2/data.xlsx">Файл</a>
 <br>
 <details>
 <summary>Весь код</summary>
