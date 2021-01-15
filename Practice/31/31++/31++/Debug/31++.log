@@ -1,0 +1,4 @@
+﻿  31++.cpp
+C:\Programming\Practice\31\31++\31++\31++.cpp(16,23): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Programming\Practice\31\31++\31++\31++.cpp(28,15): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
+  31++.vcxproj -> C:\Programming\Practice\31\31++\Debug\31++.exe

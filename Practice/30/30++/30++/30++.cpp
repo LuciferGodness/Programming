@@ -1,250 +1,281 @@
 ﻿// 30++.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
 //
+#include<iostream>
+#include <vector>
+#include <string>
+#include <random>
+using namespace std;
 
-# include <iostream>
-# include <vector>
-# include <cstdlib>
-# include <ctime>
-# include <algorithm>
-# include <string>
-
-struct Coin {
+struct Coin
+{
     int count;
 };
 
-struct Rune {
-    enum class Element { FIRE, WATER, EARTH, AIR } element;
+struct Rune
+{
     int level;
+    enum Element
+    {
+        Fire,
+        Air,
+        Earth,
+        Water,
+    }
+    elem;
 };
 
-std::string to_string(Rune::Element& element);
-
-struct Weapon {
+struct Weapon
+{
     int damage;
     int critical;
     int durability;
 };
 
-struct Armor {
+struct Armor
+{
     int guard;
     int durability;
 };
 
-struct Item;
-Item generateItem();
-
 struct Item
 {
-    enum class ItemType { COIN, RUNE, WEAPON, ARMOR } type;
-    union Value { Coin coin; Rune rune; Weapon weapon; Armor armor; } value;
-
-    Item& operator++()
+    enum class ItemType
     {
-        *this = generateItem();
-        return *this;
-    }
+        Coin,
+        Rune,
+        Weapon, 
+        Armor
+    } type;
+    union four
+    {
+        Coin c;
+        Rune r;
+        Weapon w;
+        Armor a;
+    }value;
 };
 
-Item GetCoin(int count);
+using LootBox = vector<Item>;
 
-Item GetRune(Rune::Element element, int level);
-Item GetFireRune(int level);
-Item GetWaterRune(int level);
-Item GetEarthRune(int level);
-Item GetAirRune(int level);
-
-Item GetWeapon(int damage, int critical, int durability);
-Item GetArmor(int guard, int durability);
-
-template<class T, class S>
-struct Pair
+Item Bag()
 {
-    T first;
-    S second;
-};
-
-std::vector<Pair<Item, double>> chances{
-    {GetCoin(1000), 50.0},
-    {GetFireRune(1), 6.0},
-    {GetWaterRune(1), 13.0},
-    {GetEarthRune(1), 7.0},
-    {GetAirRune(1), 14.0},
-    {GetFireRune(5), 0.6},
-    {GetWaterRune(5), 1.3},
-    {GetEarthRune(5), 0.7},
-    {GetAirRune(5), 1.4},
-    {GetFireRune(5), 0.06},
-    {GetWaterRune(5), 0.13},
-    {GetEarthRune(5), 0.07},
-    {GetAirRune(5), 0.14},
-    {GetWeapon(100, 0, 100), 1.4},
-    {GetWeapon(75, 50, 100), 1.4},
-    {GetArmor(50, 100), 2.8},
-};
-
-const int precision = 100;  // Точность до сотых в шансах
-double count_total_chance() {
-    double sum = 0;
-    for (auto& pair : chances) {
-        sum += pair.second;
-    }
-    return sum * precision;
-}
-
-const double total_chance = count_total_chance();  // сумма всех шансов
-
-using LootBox = std::vector<Item>;
-
-LootBox generateLootBox();
-
-LootBox& operator<<(LootBox& lootbox, Item& item);
-
-std::ostream& operator<<(std::ostream& out, Item& item);
-
-std::ostream& operator<<(std::ostream& out, LootBox& lootbox);
-
-// std::string toLowerCase(std::string str);
-
-// std::string toLowerCase(std::string data) {
-//     return std::transform(data.begin(), data.end(), data.begin(),
-//     [](unsigned char c){ return std::tolower(c); });
-// }
-
-LootBox& operator<<(LootBox& lootbox, Item item) {
-    lootbox.push_back(item);
-    return lootbox;
-}
-
-Item generateItem() {
-    double r = double(rand() % int(total_chance)) / 100; // [0.00; 100.00)
-    double current_sum = 0;
-
-    for (auto& elem : chances) {
-        if (current_sum <= r and r < current_sum + elem.second) {
-            return elem.first;
+    int k;
+    vector<Item> bag;
+    Item add;
+    for (int i = 0; i < 16; i++)
+    {
+        switch (i)
+        {
+        case 0:
+        {
+            add = { Item::ItemType::Coin };
+            add.value.c.count = 1000;
+            k = 5000;
+            break;
         }
-        current_sum += elem.second;
-    }
-    return chances[0].first;
-}
-
-LootBox generateLootBox() {
-    LootBox box;
-    std::srand(std::time(0));
-
-    for (int i = 0; i < 3; ++i) {
-        box << generateItem();
-    }
-    return box;
-}
-
-std::ostream& operator<<(std::ostream& out, Item& item) {
-    Item::ItemType& type = item.type;
-
-    if (type == Item::ItemType::COIN) {
-        out << item.value.coin.count << " gold";
-    }
-    else if (type == Item::ItemType::RUNE) {
-        Rune& rune = item.value.rune;
-        out << "Rune of " << to_string(rune.element)
-            << " level " << rune.level;
-    }
-    else if (type == Item::ItemType::WEAPON) {
-        Weapon& weapon = item.value.weapon;
-        out << "Weapon {damage: " << weapon.damage
-            << ", critical: " << weapon.critical
-            << ", durability: " << weapon.durability
-            << "}";
-    }
-    else if (type == Item::ItemType::ARMOR) {
-        Armor& armor = item.value.armor;
-        out << "Armor {guard: " << armor.guard
-            << ", durability: " << armor.durability
-            << "}";
-    }
-    out << std::flush;
-    return out;
-}
-
-std::ostream& operator<<(std::ostream& out, LootBox& lootbox) {
-    for (auto& elem : lootbox) {
-        out << elem << "\n" << std::flush;
-    }
-    return out;
-}
-
-std::string to_string(Rune::Element& element) {
-    std::string result;
-
-    switch (element) {
-    case Rune::Element::FIRE:
-        result = "fire";
-        break;
-    case Rune::Element::WATER:
-        result = "water";
-        break;
-    case Rune::Element::EARTH:
-        result = "earth";
-        break;
-    case Rune::Element::AIR:
-        result = "air";
-        break;
-    }
-
-    return result;
-}
-
-Item GetCoin(int count) {
-    return {
-        Item {
-            Item::ItemType::COIN,
-            Item::Value {.coin = Coin{count}}
+        case 1:
+        {
+            add = { Item::ItemType::Rune };
+            add.value.r.level = 1;
+            add.value.r.elem = Rune::Element::Fire;
+            k = 600;
+            break;
         }
-    };
-}
-Item GetRune(Rune::Element element, int level) {
-    return {
-        Item {
-            Item::ItemType::RUNE,
-            Item::Value {
-                .rune = Rune {
-                    element,
-                    level
-                }
-            }
+        case 2:
+        {
+            add = { Item::ItemType::Rune };
+            add.value.r.level = 1;
+            add.value.r.elem = Rune::Element::Air;
+            k = 1400;
+            break;
+        }
+        case 3:
+        {
+            add = { Item::ItemType::Rune };
+            add.value.r.level = 1;
+            add.value.r.elem = Rune::Element::Earth;
+            k = 700;
+            break;
+        }
+        case 4:
+        {
+            add = { Item::ItemType::Rune };
+            add.value.r.level = 1;
+            add.value.r.elem = Rune::Element::Water;
+            k = 1300;
+            break;
+        }
+        case 5:
+        {
+            add = { Item::ItemType::Rune };
+            add.value.r.level = 5;
+            add.value.r.elem = Rune::Element::Fire;
+            k = 60;
+            break;
+        }
+        case 6:
+        {
+            add = { Item::ItemType::Rune };
+            add.value.r.level = 5;
+            add.value.r.elem = Rune::Element::Air;
+            k = 140;
+            break;
+        }
+        case 7:
+        {
+            add = { Item::ItemType::Rune };
+            add.value.r.level = 5;
+            add.value.r.elem = Rune::Element::Earth;
+            k = 70;
+            break;
+        }
+        case 8:
+        {
+            add = { Item::ItemType::Rune };
+            add.value.r.level = 5;
+            add.value.r.elem = Rune::Element::Water;
+            k = 130;
+            break;
+        }
+        case 9:
+        {
+            add = { Item::ItemType::Rune };
+            add.value.r.level = 10;
+            add.value.r.elem = Rune::Element::Fire;
+            k = 6;
+            break;
+        }
+        case 10:
+        {
+            add = { Item::ItemType::Rune };
+            add.value.r.level = 10;
+            add.value.r.elem = Rune::Element::Air;
+            k = 14;
+            break;
+        }
+        case 11:
+        {
+            add = { Item::ItemType::Rune };
+            add.value.r.level = 10;
+            add.value.r.elem = Rune::Element::Earth;
+            k = 7;
+            break;
+        }
+        case 12:
+        {
+            add = { Item::ItemType::Rune };
+            add.value.r.level = 10;
+            add.value.r.elem = Rune::Element::Water;
+            k = 13;
+            break;
+        }
+        case 13:
+        {
+            add = { Item::ItemType::Weapon };
+            add.value.w.damage = 100;
+            add.value.w.critical = 0;
+            add.value.w.durability = 100;
+            k = 140;
+            break;
+        }
+        case 14:
+        {
+            add = { Item::ItemType::Weapon };
+            add.value.w.damage = 75;
+            add.value.w.critical = 50;
+            add.value.w.durability = 100;
+            k = 140;
+            break;
+        }
+        case 15:
+        {
+            add = { Item::ItemType::Armor };
+            add.value.a.durability = 100;
+            add.value.a.guard = 50;
+            k = 280;
+            break;
+        }
+        }
+        while (k)
+        {
+            bag.push_back(add);
+            k--;
         }
     };
-}
-Item GetFireRune(int level) {
-    return GetRune(Rune::Element::FIRE, level);
-}
-Item GetWaterRune(int level) {
-    return GetRune(Rune::Element::WATER, level);
-}
-Item GetEarthRune(int level) {
-    return GetRune(Rune::Element::EARTH, level);
-}
-Item GetAirRune(int level) {
-    return GetRune(Rune::Element::AIR, level);
-}
-Item GetWeapon(int damage, int critical, int durability) {
-    return {
-        Item {
-            Item::ItemType::WEAPON,
-            Item::Value{.weapon = Weapon{damage, critical, durability}}
-        }
-    };
-}
-Item GetArmor(int guard, int durability) {
-    return {
-        Item {
-            Item::ItemType::ARMOR,
-            Item::Value{.armor = Armor{guard, durability}}
-        }
-    };
+    int random = 1 + rand() % 10000;
+    return (bag[random]);
 }
 
-using namespace std;
+Item operator ++ (Item add)
+{
+    Item item = Bag();
+    return item;
+}
+
+LootBox& operator << (LootBox& loot, Item i)
+{
+    loot.push_back(i);
+    return loot;
+}
+
+ostream& operator << (ostream& ostream, Item i)
+{
+    if (i.value.c.count == 1000)
+        ostream << i.value.c.count << " Coins " << endl;
+    if (i.value.r.level == 1 || i.value.r.level == 5 || i.value.r.level == 10)
+    {
+        switch (i.value.r.elem)
+        {
+        case 0:
+        {
+            ostream << "Rune of Fire " << i.value.r.level << " level" << endl;
+            break;
+        }
+        case 1:
+        {
+            ostream << "Rune of Air " << i.value.r.level << " level" << endl;
+            break;
+        }
+        case 2:
+        {
+            ostream << "Rune of Earth " << i.value.r.level << " level" << endl;
+            break;
+        }
+        case 3:
+        {
+            ostream << "Rune of Water " << i.value.r.level << " level" << endl;
+            break;
+        }
+        }
+    }
+        if (i.value.w.damage == 100 && i.value.w.critical == 0)
+            ostream << "God Killer" << endl;
+        if (i.value.w.damage == 75 && i.value.w.critical == 50)
+            ostream << "Demon Slayer" << endl;
+        if (i.value.a.guard == 50)
+            ostream << "Bronezhiletka " << endl;
+        return ostream;
+}
+
+ostream& operator << (ostream& ostream, LootBox loot)
+{
+    for (int i = 0; i < loot.size(); i++)
+    {
+        ostream << loot[i] << endl;
+    }
+    return ostream;
+}
+
+LootBox generateLootBox()
+{
+    LootBox end;
+    for (int i = 0; i < 3; i++)
+    {
+        Item add = {};
+        end << ++add;
+    }
+    return end;
+}
 int main()
 {
     setlocale(0, "");
@@ -253,7 +284,7 @@ int main()
     cin >> line;
     if (line == "Y" or line == "yes" or line == "y" or line == "YES" or line == "Yes")
     {
-        cout << "Молодес" << endl;
+        cout << generateLootBox() << endl;
         return main();
     }
     else if (line == "NO" or line == "N" or line == "n" or line == "no" or line == "No")
