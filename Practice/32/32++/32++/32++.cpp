@@ -9,15 +9,6 @@
 #include <algorithm>
 using namespace std;
 
-string ReplaceAll(std::string str, const std::string& from, const std::string& to) {
-	size_t start_pos = 0;
-	while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
-		str.replace(start_pos, from.length(), to);
-		start_pos += to.length(); 
-	}
-	return str;
-}
-
 struct Passenger
 {
 	int id;
@@ -34,17 +25,17 @@ struct Passenger
     string embarked;
 };
 
-std::vector<std::vector<std::string>> parse_cvs(
-	std::istream& out,
+vector<vector<string>> parse_cvs(
+	istream& out,
 	char end_ch = '\r',
 	char quote_ch = '"',
 	char sep_ch = ',')
 {
-	std::string line;
-	std::string buffer;
+	string line;
+	string buffer;
 
-	std::vector<std::string> seperated_string;
-	std::vector<std::vector<std::string>> result;
+	vector<string> seperated_string;
+	vector<vector<string>> result;
 
 	char quote_depth = 0;
 	char pos = 0;
@@ -102,16 +93,16 @@ istream& operator >> (istream& i, vector<Passenger>& passengers)
 	for (auto row : matrix) {
 		Passenger p;
 
-		p.id = std::stoi(row[0]);
-		p.survival = std::stoi(row[1]);
-		p.pclass = std::stoi(row[2]);
+		p.id = stoi(row[0]);
+		p.survival = stoi(row[1]);
+		p.pclass = stoi(row[2]);
 		p.name = row[3];
 		p.sex = row[4];
-		p.age = row[5] == "" ? 0 : std::stof(row[5]);
-		p.sibsp = std::stoi(row[6]);
-		p.parch = std::stoi(row[7]);
+		p.age = row[5] == "" ? 0 : stof(row[5]);
+		p.sibsp = stoi(row[6]);
+		p.parch = stoi(row[7]);
 		p.ticket = row[8];
-		p.fare = std::stof(row[9]);
+		p.fare = stof(row[9]);
 		p.cabin = row[10];
 		p.embarked = row[11][0];
 
@@ -121,12 +112,20 @@ istream& operator >> (istream& i, vector<Passenger>& passengers)
 	return i;
 }
 
+string ReplaceAll(string str, const string& from, const string& to) {
+	size_t start_pos = 0;
+	while ((start_pos = str.find(from, start_pos)) != string::npos) {
+		str.replace(start_pos, from.length(), to);
+		start_pos += to.length();
+	}
+	return str;
+}
 ostream& operator << (ostream& o, vector <Passenger>& passengers)
 {
 	char sep = ',';
 	char end = '\r';
 	for (auto& pass : passengers) {
-		std::string name = pass.name;
+		string name = pass.name;
 		name = ReplaceAll(name, "\"", "\"\"");
 
 		o << pass.id << sep
