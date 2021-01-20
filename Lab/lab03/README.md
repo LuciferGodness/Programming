@@ -1,0 +1,285 @@
+<p align="center">МИНИСТЕРСТВО НАУКИ  И ВЫСШЕГО ОБРАЗОВАНИЯ РОССИЙСКОЙ ФЕДЕРАЦИИ<br>
+Федеральное государственное автономное образовательное учреждение высшего образования<br>
+"КРЫМСКИЙ ФЕДЕРАЛЬНЫЙ УНИВЕРСИТЕТ им. В. И. ВЕРНАДСКОГО"<br>
+ФИЗИКО-ТЕХНИЧЕСКИЙ ИНСТИТУТ<br>
+Кафедра компьютерной инженерии и моделирования</p>
+<br>
+<h3 align="center">Отчёт по лабораторной работе №3<br> по дисциплине "Программирование"</h3>
+<br><br>
+<p>студенти 1 курса группы ПИ-б-о-201(2)<br>
+Абибулаева Эмине Ридван къызы<br>
+направления подготовки 09.03.04 "Программная инженерия"</p>
+<br><br>
+<table>
+<tr><td>Научный руководитель<br> старший преподаватель кафедры<br> компьютерной инженерии и моделирования</td>
+<td>(оценка)</td>
+<td>Чабанов В.В.</td>
+</tr>
+</table>
+<br><br>
+<p align="center">Симферополь, 2020</p>
+<hr>
+<h2> Цель </h2>
+<br>
+1.Закрепить навыки разработки программ с простым графическим интерфейсом пользователя на языке Python при помощи библиотеки Tkinter;
+<br>
+2.Получить представление о разработке простых игровых приложений.
+<br>
+<h2>Постановка задачи</h2>
+<br>
+1.Используя стандартный модуль для разработки программ с графическим интерфейсом Tkinter реализуйте игру Lines на зыке Python.
+<br>
+2.В качестве образца графического интерфейса используйте данную игру.
+<br>
+<h2>Выполнение работы</h2>
+<br>
+Для начала, установила библиотеку Pillow для работы с картинками. Итак, необходимо было решить проблему наложения картинки с шариком поверх плитки и выделение плитки. Для размещения 
+воспользовалась методом alpha_composite, так как через paste не получалось. Разобравшись с этим, написала функцию, которая передвигала шарики с одной плитки на другую и функцию, которая меняла картинку с неактивной плиткой на картинку с активной. Также решила проблему с 
+выбором рандомных плиток для размешения на них шариков после каждого хода и при старте новой игры. Написала функцию, которая удаляла ровно 5 шариков с поля одного цвета (если они расположены в ряд). В конце добавила кнопки "Начать заново" и "Сделать ход", а также подсчёт Счёта. 
+<br>
+<img src=./image/skrin.png> 
+<br>
+Рис. 1 - Интерфейс игры
+<br>
+<details>
+<summary>Весь код</summary>
+
+```python
+from tkinter import *
+import random
+import copy
+from PIL import ImageTk, Image
+ 
+frame = Tk()
+ 
+actual_game = [[0 for i in range(9)] for j in range(9)]
+ 
+class Mark(Label):
+    def __init__(self, row, col):
+        Label.__init__(self, master = frame)
+        self.row = row
+        self.col = col
+        self.coltype = "ntg"
+        self.if_has = False
+ 
+frame["bg"] = "#660099"
+frame.title("Я каменьщик")
+ 
+red_t = Image.open("ball-red.png").convert('RGBA')
+vio_t = Image.open("ball-violet.png").convert('RGBA')
+blue_t = Image.open("ball-blue.png").convert('RGBA')
+aqua_t = Image.open("ball-aqua.png").convert('RGBA')
+yellow_t = Image.open("ball-yellow.png").convert('RGBA')
+green_t = Image.open("ball-green.png").convert('RGBA')
+pink_t = Image.open("ball-pink.png").convert('RGBA')
+ 
+balls = {"red": red_t, "vio": vio_t, "blue": blue_t, "aqua": aqua_t, "yellow": yellow_t, "green": green_t, "pink": pink_t}
+ 
+def send():
+    global click
+    click = ()
+send()
+ 
+frame.resizable(width = False, height = False)
+frame.geometry("1000x700")
+tile_a = Image.open("cell_a.png").convert('RGBA')
+tile_d = Image.open("cell_d.png").convert('RGBA')
+tile_d_creat = ImageTk.PhotoImage(tile_d)
+balls_a = {}
+ 
+for i in ["red", "vio", "blue", "aqua", "yellow", "green", "pink"]:
+    pic_for_ball_a = Image.new("RGBA", tile_a.size)
+    pic_for_ball_d = Image.new("RGBA", tile_d.size)
+    pic_for_ball_a.paste(balls[i], (7, 7))
+    pic_for_ball_d.paste(balls[i], (7, 7))
+    img1 = Image.alpha_composite(tile_a, pic_for_ball_a)
+    img2 = Image.alpha_composite(tile_d, pic_for_ball_d)
+    if_click_tile = ImageTk.PhotoImage(img1)
+    if_not_click_tile = ImageTk.PhotoImage(img2)
+    balls_a[i] = (if_not_click_tile, if_click_tile)
+ 
+result = 0
+located = []
+ball_on = {"red": [], "vio": [], "blue": [], "aqua": [], "yellow": [], "green": [], "pink": []}
+
+def scores():
+    global result
+    score = Label(frame, text = "Счёт: %d" % result, font = ("Times New Roman", "20"), fg = "white", bg = "#660099", padx = 5, pady = 5)
+    score.grid(row = 1, column = 10, padx = 10)  
+ 
+def check():
+    global result
+    global free_tile
+    global game_end
+    free_tile = []
+    for j in range(9):
+        for k in range(9):
+            if not actual_game[j][k].if_has:
+                free_tile.append((j,k))
+            else:
+                def check_01(i, r):
+                    if_same = True
+                    while if_same:
+                        try:
+                            if not (actual_game[j+i][k+r].coltype == actual_game[j][k].coltype):
+                                if_same = False
+                            else:
+                                if i != r:
+                                    if i > r:
+                                        if i > 0:
+                                            i = i+1
+                                        else:
+                                            i = i-1
+                                    else:
+                                        if r > 0:
+                                            r = r+1
+                                        else:
+                                            r = r-1
+                                else:
+                                    if i > 0:
+                                        i = i+1
+                                        r = r+1
+                                    elif i == 0:
+                                        i = i+1
+                                        r = r-1
+                                    else:
+                                        i = i-1
+                                        r = r-1
+                        except IndexError:
+                            if_same = False
+                    return (i, r)
+                c = [check_01(i, r) for i, r in [(0,0), (0, 1), (1, 0), (1, 1), (-1, 1), (1, -1)]]
+                for i, r in c:
+                    if max(abs(i), abs(r)) == 5:
+                        result = result + max(abs(i), abs(r)) * 2
+                        for u in range(max(abs(i), abs(r))):
+                            if max(abs(i), abs(r)) == abs(i) and i != r:
+                                actual_game[j+u][k].config(image = tile_d_creat)
+                                actual_game[j+u][k].coltype = "ntg"
+                                actual_game[j+u][k].if_has = False
+                            elif max(abs(i), abs(r)) == abs(r) and i != r:
+                                actual_game[j][k+u].config(image=tile_d_creat)
+                                actual_game[j][k+u].coltype = "ntg"
+                                actual_game[j][k+u].if_has = False
+                            else:
+                                actual_game[j+u][k+u].config(image=tile_d_creat)
+                                actual_game[j+u][k+u].coltype = "ntg"
+                                actual_game[j+u][k+u].if_has = False
+        if not free_tile:
+            game_end = Label(master = frame, text = "Вы dead", font = ("Times New Roman", "36"), borderwidth = 0)
+            game_end.place(x = 300, y = 300)
+def move():
+    global t_t
+    global free_tile
+    global game_end
+ 
+    gener = ["red", "vio", "blue", "aqua", "yellow", "green", "pink", "ntg"]
+    xy = [(random.randrange(0, 8), random.randrange(0, 8))]
+ 
+    check()
+ 
+    for i in range(3):
+        b = random.randrange(0, 7)
+        try:
+            xprob, yprob = random.choice(free_tile)
+        except IndexError:
+            game_end = Label(master = frame, text = "Вы dead.", font =("Times New Roman", "36"))
+            game_end.place(x = 300, y = 300)
+ 
+        try:
+            xy.append((xprob, yprob))
+            ball_on[gener[b]].append(xy[i])
+            if not actual_game[xy[i][0]][xy[i][1]].if_has:
+                actual_game[xy[i][0]][xy[i][1]].config(image = balls_a[gener[b]][0])
+                actual_game[xy[i][0]][xy[i][1]].coltype = gener[b]
+                actual_game[xy[i][0]][xy[i][1]].if_has = True
+            else:
+                pass
+        except UnboundLocalError:
+            pass
+    t_t = ball_on.copy()
+    scores()
+    xy.pop()
+    
+def possible(i1, j1, i2, j2):
+
+    if actual_game[i1][j1].if_has:
+       return True
+    else:
+        return False
+ 
+def pl_move(event):
+    tile_now = actual_game[event.widget.row][event.widget.col]
+    global click
+    global ball_on
+    global game_end
+ 
+    check()
+ 
+    if tile_now.if_has:
+        event.widget.config(image = balls_a[tile_now.coltype][1])
+        click = (event.widget.row, event.widget.col)
+        # print(click)
+    elif click:
+        if possible(click[0], click[1], tile_now.row, tile_now.col):
+            tile_now.if_has = True
+            tile_now.coltype = copy.copy(actual_game[click[0]][click[1]].coltype)
+            ball_on[tile_now.coltype].remove(click)
+            ball_on[tile_now.coltype].append((tile_now.row, tile_now.col))
+            actual_game[tile_now.row][tile_now.col].config(image = balls_a[tile_now.coltype][0])
+            actual_game[click[0]][click[1]].if_has = False
+            actual_game[click[0]][click[1]].coltype = "ntg"
+            actual_game[click[0]][click[1]].config(image = tile_d_creat)
+            move()
+    else:
+        pass
+for row in range(9):
+    for col in range(9):
+        cell = Mark(row, col) 
+        actual_game[row][col] = cell
+        cell.config(image = tile_d_creat, borderwidth=0)
+        cell.bind("<Button-1>", pl_move)
+        cell.grid(row=row, column=col, padx=1, pady=1)      
+move()
+ 
+def new_game():
+    global result
+    global game_end
+    for i in range(9):
+        for j in range(9):
+            actual_game[i][j].config(image = tile_d_creat)
+            actual_game[i][j].coltype = "ntg"
+            actual_game[i][j].if_has = False
+    move()
+    result = 0
+    game_end.destroy()
+    scores()
+    check()
+new = Button(master = frame, text = "Начать заново", padx = 5, pady = 5, font = ("Times New Roman", "16"), background = "white", activebackground = "#240935", command = new_game)
+new.grid(row = 8,column = 10, padx = 10)
+ 
+make_move = Button(master = frame, text = "Сделать ход", padx = 4, pady =4, font = ("Times New Roman", "16"), background = "white", activebackground = "#240935", command = move)
+make_move.grid(row = 7, column = 10, padx = 10)
+ 
+Title = Label(frame, text = "Колобочки", font = ("Times New Roman", "24"), fg = "white", bg = "#660099")
+Title.grid(row = 0, column = 10, padx = 10)
+help = Label(frame, text = "Ваша рука помощи", font = ("Times New Roman", "20"), fg = "white", bg = "#660099")
+help.grid(row = 3, column = 10, padx = 10)
+ 
+def show():
+    global t_t
+    for i in t_t.keys():
+        c = 0
+        if t_t[i]:
+            for j in t_t[i]:    
+                t_t_1 = Label(frame, image = balls_a[i][0], borderwidth = 0)
+                t_t_1.grid(row = 4+c, column = 10, padx = 10)
+                c = c+1
+show()
+frame.mainloop()
+```
+</details>
+<br>
+<h2> Вывод: </h2>
+<br>
+Закрепила навыки разработки программ с простым графическим интерфейсом на языке python с использованием библиотек Tkinter. Получила представление о разработки простых игровых приложений. 
